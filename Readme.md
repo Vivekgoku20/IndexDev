@@ -142,7 +142,15 @@ Index Composition:
 <img width="1319" height="854" alt="image" src="https://github.com/user-attachments/assets/76c42904-ec6d-4349-8f6c-ef6fb669e4f1" />
 
 Composition Changes:
-<img width="1762" height="994" alt="image" src="https://github.com/user-attachments/assets/2bc5b4af-3f85-45a4-93ed-914f2232b238" />
+<img width="1415" height="895" alt="image" src="https://github.com/user-attachments/assets/85e69e02-b981-4460-b4a1-fe4b7098465e" />
+
+Index Performance:
+![Uploading image.png…]()
+
+Export Date:
+![Uploading image.png…]()
+
+
 
 
 ## API Usage

@@ -207,64 +207,19 @@ You can import the following curl commands into Postman:
 ```
 
 ## Production & Scaling Recommendations
-
-### Database Optimizations
-- Implement connection pooling using asyncpg
 - Add indexes for frequently queried columns (date, symbol, market_cap)
 - Partition daily_data table by date ranges
 - Implement query result caching at database level
-
-### Caching Improvements
+- Use cache more effeciently by using keys for cumulative queries
 - Implement Redis cluster mode for horizontal scaling
 - Add Redis Sentinel for high availability
 - Implement cache warming for common date ranges
-- Add cache eviction policies and monitoring
 - Implement fallback cache strategy
-
-### Application Architecture
+- Load Balance requests across multiple API instances
 - Add circuit breakers for external API calls
 - Implement request rate limiting and queueing
 - Separate scheduler into standalone microservice
-- Implement CQRS pattern for read/write separation
-- Add Celery for background task processing
-
-### Performance Optimization
+- Shard the tables into different instances for fast query
 - Implement batch processing for large date ranges
-- Add pagination for large result sets
-- Use materialized views for common calculations
 - Implement parallel processing for index calculations
-- Use async bulk operations for database writes
-
-### Monitoring & Reliability
-- Add ELK stack for logging
-- Implement Prometheus + Grafana for metrics
-- Add health check endpoints
-- Implement automated failover
-- Add request tracing with OpenTelemetry
-
-### Infrastructure
-- Deploy using Kubernetes
-- Implement CI/CD pipelines
-- Use blue-green deployment strategy
-- Set up metric-based auto-scaling
-- Use managed services (Redis, PostgreSQL)
-
-### Security
-- Implement API authentication
-- Add per-client rate limiting
-- Implement API key rotation
-- Add input validation/sanitization
-- Implement secure secret management
-
-### Data Management
-- Implement data retention policies
-- Add data archival strategy
-- Implement data validation pipeline
-- Add data consistency checks
-- Consider event sourcing for data changes
-
-### Implementation Priority
-1. Monitoring and logging (immediate visibility)
-2. Database optimizations (performance foundation)
-3. Caching improvements (scalability)
-4. Security enhancements (protection)
+- Add monitoring for all the services and raise timely alets using prometheus, grafana and alert manager

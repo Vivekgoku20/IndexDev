@@ -123,7 +123,6 @@ Export Date:
    - symbol (VARCHAR, PK)
    - company_name (VARCHAR)
    - sector (VARCHAR)
-   - created_at (TIMESTAMP)
 
 2. daily_data
    - symbol (VARCHAR)

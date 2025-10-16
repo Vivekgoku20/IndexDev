@@ -1,0 +1,273 @@
+# Equal-Weighted Stock Index Service
+
+A backend service that tracks and manages a custom equal-weighted stock index of the top 100 US stocks by market capitalization.
+
+## Project Structure
+```
+IndexDev/
+├── app/
+│   ├── config.py
+│   ├── main.py
+│   ├── cache/
+│   │   └── cache.py
+│   ├── database/
+│   │   ├── database.py
+│   │   └── init_db.py
+│   ├── routers/
+│   │   └── index_router.py
+│   └── services/
+│       ├── data_acquisition.py
+│       ├── index_calculator.py
+│       └── scheduler.py
+├── docker-compose.yml
+├── docker-entrypoint.sh
+├── Dockerfile.api
+├── Dockerfile.scheduler
+├── requirements.txt
+└── README.md
+```
+
+## Setup Instructions
+
+### Quick Start (Recommended)
+
+1. Make sure Docker and Docker Compose are installed
+2. Create .env file with your API keys:
+```
+ALPHA_VANTAGE_API_KEY=your_key_here
+```
+
+3. Build and start all services:
+```bash
+docker-compose up --build
+```
+
+This single command will:
+- Build and start the FastAPI service
+- Build and start the Scheduler service
+- Start the Redis cache service
+- Set up all necessary networking between services
+- Mount the required volumes for persistent data
+
+To run in detached mode:
+```bash
+docker-compose up -d --build
+```
+
+To stop all services:
+```bash
+docker-compose down
+```
+
+### Local Development Setup (Optional)
+
+If you need to develop or debug locally without Docker, follow these steps:
+
+1. Create and activate a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+2. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+3. Create a .env file with your API keys as shown above
+
+4. Initialize the database:
+```bash
+python -m app.database.init_db
+```
+
+5. Start the FastAPI server:
+```bash
+uvicorn app.main:app --reload
+```
+
+Note: When running locally, you'll need to set up Redis separately if you need caching functionality.
+
+## Running Data Acquisition
+
+### Local Environment
+To run the data acquisition job manually:
+```bash
+python -m app.services.data_acquisition
+```
+
+### Docker Environment
+The scheduler service automatically runs data acquisition jobs based on the configured schedule. 
+To manually trigger data acquisition in Docker:
+```bash
+docker-compose exec api python -m app.services.scheduler
+```
+
+## Database Schema
+
+### Tables
+
+1. stocks
+   - symbol (VARCHAR, PK)
+   - company_name (VARCHAR)
+   - sector (VARCHAR)
+   - created_at (TIMESTAMP)
+
+2. daily_data
+   - symbol (VARCHAR)
+   - date (DATE)
+   - price (DECIMAL)
+   - market_cap (DECIMAL)
+   - volume (BIGINT)
+   - PRIMARY KEY (symbol, date)
+
+3. index_composition
+   - date (DATE)
+   - symbol (VARCHAR)
+   - weight (DECIMAL)
+   - rank (INT)
+   - PRIMARY KEY (date, symbol)
+
+4. index_performance
+   - date (DATE, PK)
+   - daily_return (DECIMAL)
+   - cumulative_return (DECIMAL)
+
+## API Usage
+
+### Build Index
+```bash
+curl -X POST "http://localhost:8000/build-index?start_date=2023-10-01&end_date=2023-10-31"
+```
+
+### Get Index Performance
+```bash
+curl "http://localhost:8000/index-performance?start_date=2023-10-01&end_date=2023-10-31"
+```
+
+### Get Index Composition
+```bash
+curl "http://localhost:8000/index-composition?date=2023-10-01"
+```
+
+### Get Composition Changes
+```bash
+curl "http://localhost:8000/composition-changes?start_date=2023-10-01&end_date=2023-10-31"
+```
+
+### Export Data
+```bash
+curl -X POST "http://localhost:8000/export-data" --output index_data.xlsx"
+```
+
+## Postman Collection
+You can import the following curl commands into Postman:
+
+```json
+{
+  "info": {
+    "name": "Stock Index API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Build Index",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:8000/build-index",
+        "query": [
+          {"key": "start_date", "value": "2023-10-01"},
+          {"key": "end_date", "value": "2023-10-31"}
+        ]
+      }
+    },
+    {
+      "name": "Get Index Performance",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/index-performance",
+        "query": [
+          {"key": "start_date", "value": "2023-10-01"},
+          {"key": "end_date", "value": "2023-10-31"}
+        ]
+      }
+    },
+    {
+      "name": "Get Index Composition",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8000/index-composition",
+        "query": [
+          {"key": "date", "value": "2023-10-01"}
+        ]
+      }
+    }
+  ]
+}
+```
+
+## Production & Scaling Recommendations
+
+### Database Optimizations
+- Implement connection pooling using asyncpg
+- Add indexes for frequently queried columns (date, symbol, market_cap)
+- Partition daily_data table by date ranges
+- Implement query result caching at database level
+
+### Caching Improvements
+- Implement Redis cluster mode for horizontal scaling
+- Add Redis Sentinel for high availability
+- Implement cache warming for common date ranges
+- Add cache eviction policies and monitoring
+- Implement fallback cache strategy
+
+### Application Architecture
+- Add circuit breakers for external API calls
+- Implement request rate limiting and queueing
+- Separate scheduler into standalone microservice
+- Implement CQRS pattern for read/write separation
+- Add Celery for background task processing
+
+### Performance Optimization
+- Implement batch processing for large date ranges
+- Add pagination for large result sets
+- Use materialized views for common calculations
+- Implement parallel processing for index calculations
+- Use async bulk operations for database writes
+
+### Monitoring & Reliability
+- Add ELK stack for logging
+- Implement Prometheus + Grafana for metrics
+- Add health check endpoints
+- Implement automated failover
+- Add request tracing with OpenTelemetry
+
+### Infrastructure
+- Deploy using Kubernetes
+- Implement CI/CD pipelines
+- Use blue-green deployment strategy
+- Set up metric-based auto-scaling
+- Use managed services (Redis, PostgreSQL)
+
+### Security
+- Implement API authentication
+- Add per-client rate limiting
+- Implement API key rotation
+- Add input validation/sanitization
+- Implement secure secret management
+
+### Data Management
+- Implement data retention policies
+- Add data archival strategy
+- Implement data validation pipeline
+- Add data consistency checks
+- Consider event sourcing for data changes
+
+### Implementation Priority
+1. Monitoring and logging (immediate visibility)
+2. Database optimizations (performance foundation)
+3. Caching improvements (scalability)
+4. Security enhancements (protection)
+5. Infrastructure improvements (reliability)
+6. Application architecture changes (maintainability)
+7. Data management (long-term sustainability)

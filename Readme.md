@@ -133,6 +133,18 @@ docker-compose exec api python -m app.services.scheduler
    - daily_return (DECIMAL)
    - cumulative_return (DECIMAL)
 
+Evidence:
+
+Build Index:
+<img width="1313" height="837" alt="image" src="https://github.com/user-attachments/assets/796a7673-b94d-4a25-87b7-741b62d85876" />
+
+Index Composition:
+<img width="1319" height="854" alt="image" src="https://github.com/user-attachments/assets/76c42904-ec6d-4349-8f6c-ef6fb669e4f1" />
+
+Composition Changes:
+<img width="1762" height="994" alt="image" src="https://github.com/user-attachments/assets/2bc5b4af-3f85-45a4-93ed-914f2232b238" />
+
+
 ## API Usage
 
 ### Build Index

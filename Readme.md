@@ -63,25 +63,20 @@ docker-compose down
 
 If you need to develop or debug locally without Docker, follow these steps:
 
-1. Create and activate a virtual environment:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
 
-2. Install dependencies:
+1. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Create a .env file with your API keys as shown above
+2. Create a .env file with your API keys as shown above
 
-4. Initialize the database:
+3. Initialize the database:
 ```bash
 python -m app.database.init_db
 ```
 
-5. Start the FastAPI server:
+4. Start the FastAPI server:
 ```bash
 uvicorn app.main:app --reload
 ```

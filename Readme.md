@@ -102,6 +102,23 @@ To manually trigger data acquisition in Docker:
 ```bash
 docker-compose exec api python -m app.services.scheduler
 ```
+Evidence:
+
+Build Index:
+<img width="1313" height="837" alt="image" src="https://github.com/user-attachments/assets/796a7673-b94d-4a25-87b7-741b62d85876" />
+
+Index Composition:
+<img width="1319" height="854" alt="image" src="https://github.com/user-attachments/assets/76c42904-ec6d-4349-8f6c-ef6fb669e4f1" />
+
+Composition Changes:
+<img width="1415" height="895" alt="image" src="https://github.com/user-attachments/assets/85e69e02-b981-4460-b4a1-fe4b7098465e" />
+
+Index Performance:
+![Uploading image.png…]()
+
+Export Date:
+![Uploading image.png…]()
+
 
 ## Database Schema
 

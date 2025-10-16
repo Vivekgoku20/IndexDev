@@ -48,7 +48,7 @@ This single command will:
 - Start the Redis cache service
 - Set up all necessary networking between services
 - Mount the required volumes for persistent data
-
+- in dockerfile.scheduler, you can add a initialize flag if you want to populate the data for last 30 days on first run
 To run in detached mode:
 ```bash
 docker-compose up -d --build
@@ -268,6 +268,3 @@ You can import the following curl commands into Postman:
 2. Database optimizations (performance foundation)
 3. Caching improvements (scalability)
 4. Security enhancements (protection)
-5. Infrastructure improvements (reliability)
-6. Application architecture changes (maintainability)
-7. Data management (long-term sustainability)

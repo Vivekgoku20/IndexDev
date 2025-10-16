@@ -71,13 +71,12 @@ async def get_composition_changes(
     """Get composition changes for a date range (cached)"""
     calculator = IndexCalculator(db, cache)
     composition = await calculator.get_composition_changes(start_date, end_date)
-    return composition
     if not composition:
-        print("fdaafd")
         raise HTTPException(
             status_code=404,
             detail=f"No composition data available for date {date}"
         )
+    return composition
 
 @router.post("/export-data")
 async def export_data(

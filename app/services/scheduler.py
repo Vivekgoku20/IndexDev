@@ -4,6 +4,8 @@ from .data_acquisition import DataAcquisition
 import asyncio
 import pytz
 import logging
+import sys
+from datetime import datetime, timedelta
 
 # Set up logging
 logging.basicConfig(
@@ -15,33 +17,41 @@ logger = logging.getLogger('data_acquisition_scheduler')
 # Get API key from environment
 ALPHA_VANTAGE_KEY = "1TGM5D84GWXOA3VJ"
 
-async def run_acquisition_job():
-    print("running for test")
-    # """Wrapper function to run the acquisition job with error handling"""
-    # try:
-    #     logger.info("Starting scheduled data acquisition job")
-    #     # Initialize with API key
-    #     acquisition = DataAcquisition(api_key=ALPHA_VANTAGE_KEY)
-    #     # Run for last 2 days to ensure we have complete data
-    #     await acquisition.run_acquisition(days=30)
-    #     logger.info("Scheduled data acquisition job completed successfully")
-    # except Exception as e:
-    #     logger.error(f"Error in scheduled data acquisition job: {str(e)}", exc_info=True)
+async def run_acquisition_job(days=1):
+    """Wrapper function to run the acquisition job with error handling"""
+    try:
+        logger.info(f"Starting data acquisition job for {days} days")
+        acquisition = DataAcquisition(api_key=ALPHA_VANTAGE_KEY)
+        await acquisition.run_acquisition(days=days)
+        logger.info("Data acquisition job completed successfully")
+    except Exception as e:
+        logger.error(f"Error in data acquisition job: {str(e)}", exc_info=True)
 
-async def test_job():
-    print("hellooo")
+async def initialize_data():
+    """Initial data backfill for 30 days"""
+    logger.info("Starting initial data backfill")
+    await run_acquisition_job(days=30)
+    logger.info("Initial data backfill completed")
 
 async def main():
+    # Check if initialization mode is requested
+    initialize = len(sys.argv) > 1 and sys.argv[1] == '--initialize'
+
     # Create scheduler with timezone awareness
     scheduler = AsyncIOScheduler(timezone=pytz.timezone('America/New_York'))
 
-    # Schedule the data acquisition to run at 4:30 AM Eastern Time
+    if initialize:
+        logger.info("Running in initialization mode")
+        # Run initial backfill immediately
+        await initialize_data()
+
+    # Schedule the daily data acquisition to run at 4:30 AM Eastern Time
     scheduler.add_job(
-        test_job,
+        run_acquisition_job,
         CronTrigger(
-            hour=0,
-            minute=32,
-            timezone=pytz.timezone('Asia/Kolkata')
+            hour=4,
+            minute=30,
+            timezone=pytz.timezone('America/New_York')
         ),
         id='daily_acquisition',
         name='Daily stock data acquisition',
@@ -53,24 +63,11 @@ async def main():
     logger.info("Starting scheduler")
     scheduler.start()
     try:
-        next_run = scheduler.get_job('daily_acquisition').next_run_time
-        logger.info(f"Next scheduled run at: {next_run}")
-        # Keep the script running
-        while True:
-            await asyncio.sleep(60)
-
+        # Keep the scheduler running
+        await asyncio.get_event_loop().create_future()
     except (KeyboardInterrupt, SystemExit):
         logger.info("Shutting down scheduler")
         scheduler.shutdown()
-    except Exception as e:
-        logger.error(f"Unexpected error in scheduler: {str(e)}", exc_info=True)
-        scheduler.shutdown()
-        raise
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except Exception as e:
-        print(f"Test failed: {str(e)}")
-        raise
-
+    asyncio.run(main())
